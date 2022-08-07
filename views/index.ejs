@@ -1,0 +1,63 @@
+<head>
+  <meta charset="utf-8" />
+  <script src="https://js.braintreegateway.com/web/dropin/1.33.2/js/dropin.min.js"></script>
+</head>
+<body>
+  <h1>PayPal Drop In UI Test</h1>
+  <ul>
+    <li>Author: Taijun An(Luke)</li>
+    <li>E-Mail: antaijun@gmail.com</li>
+    <li>Payment Method: Credit Card & PayPal Vault</li>
+    <li>transaction Amount: 10</li>
+  </ul>
+  <!-- Use this form to submit transaction along with payment method nonce-->
+  <form id="payment-form" action="/checkout" method="post">
+    <!-- Use this container to include Credit Card, PayPal and other payment method icons-->
+    <div id="dropin-container"></div>
+    <input type="submit" />
+    <!-- Use this hidden input to store payment method nonce-->
+    <input type="hidden" id="payment_method_nonce" name="payment_method_nonce"/>
+    <!-- Use this hidden input to store payment amount-->
+    <input type="hidden" id="payment_amount" name="payment_amount" />
+  </form>
+  <script type="text/javascript">
+    const form = document.getElementById("payment-form");
+    //request a paypal client token for the following activities
+    fetch("/client_token", { method: "post" })
+      .then((response) => response.text())
+      .then((clientToken) => {
+        //Create Braintree dropin once getting clientToken
+        braintree.dropin.create(
+          {
+            authorization: clientToken,
+            container: "#dropin-container",
+            /* add PayPal as a payment method
+               should connect PayPal with Braintree
+            */
+            paypal: {
+              flow: "vault",
+            },
+          },
+          (error, dropinInstance) => {
+            if (error) console.error(error);
+            /*
+              Use this listener to catch a user's action to complete transaction and payment
+              Create a payment method nonce for this payment and send it to server. Then server can match transactions with payments
+              Send payment amount
+            */
+            form.addEventListener("submit", (event) => {
+              event.preventDefault();
+
+              dropinInstance.requestPaymentMethod((error, payload) => {
+                if (error) console.error(error);
+                document.getElementById("payment_method_nonce").value =
+                  payload.nonce;
+                document.getElementById("payment_amount").value = 10;
+                form.submit();
+              });
+            });
+          }
+        );
+      });
+  </script>
+</body>
