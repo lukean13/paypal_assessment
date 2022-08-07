@@ -57,8 +57,15 @@ app.post("/checkout", (req, res) => {
       submitForSettlement: true
     }
   }, (err, result) => {
+      if (err) {
+      res.send("Sorry! Error eccurred! Please contact our support team to get help!");
+    }
+    if (result.success) {
+      res.send("Congrats! Your payment was successfully processed!");
+    } else {
+      res.send("Sorry! Payment does not success! ")
+    }
   });
-    res.send("Payment Complete");
 });
 
 
