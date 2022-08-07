@@ -46,7 +46,6 @@ app.post("/client_token", (req, res) => {
   
 */
 app.post("/checkout", (req, res) => {
-    /*
   const nonceFromTheClient = req.body.payment_method_nonce;
   const paymentAmount = req.body.payment_amount;
 
@@ -59,7 +58,6 @@ app.post("/checkout", (req, res) => {
     }
   }, (err, result) => {
   });
-  */
     res.send("Payment Complete");
 });
 
